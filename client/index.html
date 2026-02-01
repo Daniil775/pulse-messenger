@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="module" src="./js/index.js" defer></script>
+    <link rel="stylesheet" href="./style/style.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div id="root">
+        <div id="app">
+
+            <header>
+                <div id="logo"><img src="./assets/pulse-logo-192.jpg" alt=""></div>
+                <nav>
+                    <ul>
+                        <li><a href="">Chats</a></li>
+                        <li><a href="">Settings</a></li>
+                        <li><a href="">Support</a></li>
+                    </ul>
+            </nav>
+            <div id="account">
+                <img src="./assets/avatars/logo.png" alt="">
+                <div>
+                <div id="name">Daniiil</div>
+                <div id="email">SlonDaniil@gmail.com</div>
+                </div>
+            </div>
+            </header>
+            
+            <main>
+                <aside id="left-side">
+                    <ul class="contacts">
+                        <li class="contact">
+                            <div class="ava"><img src="./assets/avatars/logo2.png" alt=""></div>
+                            <div class="contact-info">
+                                <h4>Eyecode &copy; Community</h4>
+                                <p> Message</p>
+                            </div>
+                        </li>
+                    </ul>
+                </aside>
+                <section id="main-side">
+                    <div id="chat">
+                        <div class="message">
+                            <div class="message-box">
+                                <div class="message-user">Rat</div>
+                                <div class="message-text">Good morning, Hamster</div>
+                            </div>
+                            <div class="message-date">17:47</div>
+                        </div>
+                    </div>
+                    <div id="main-side-controls">
+                        <input id="message" type="text" placeholder="text your message..."><button id="send-message">Send</button>
+                    </div>
+                </section>
+            </main>
+
+            <footer></footer>
+        </div>
+    </div>
+
+    <script>
+        const msgInp = document.querySelector("#message");
+        const chat = document.querySelector("#chat")
+        const sendBtn = document.querySelector("#send-message");
+
+        const socket = io();
+        const usernameInfo = prompt("Enter your name");
+
+
+
+        function sendMessage(){
+            if(!msgInp.value){
+                console.log("Message is empty");
+                return;
+            }
+            let msg = msgInp.value;
+            let now = new Date();
+            let min = now.getMinutes();
+            let hour = now.getHours();
+           
+                msgInp.value = "";
+                socket.emit("chat message",{msg,hour,min})
+        }
+        
+        
+        socket.on("chat message", ({msg,hour,min,username}) =>{
+
+            isOwner = username === usernameInfo;
+             let msg_template = `
+            <div class="message ${isOwner ? "active" : ""}" >
+                <div class="message-box ${isOwner ? "active-box" : ""}">
+                    <div class="message-user">${username}</div>
+                    <div class="message-text">${msg}</div>
+                </div>
+                <div class="message-date">${hour}:${min}</div>
+            </div>
+                `
+            chat.innerHTML += msg_template
+        })
+
+        socket.emit('set username',usernameInfo)
+        
+
+        sendBtn.onclick = () => {
+            sendMessage();
+        }
+
+        
+    </script>
+</body>
+</html>
