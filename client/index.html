@@ -25,8 +25,8 @@
             <div id="account">
                 <img src="./assets/avatars/logo.png" alt="">
                 <div>
-                <div id="name">Daniiil</div>
-                <div id="email">SlonDaniil@gmail.com</div>
+                <div id="name"></div>
+                <div id="email">Your_Mail@mail.com</div>
                 </div>
             </div>
             </header>
@@ -67,9 +67,23 @@
         const msgInp = document.querySelector("#message");
         const chat = document.querySelector("#chat")
         const sendBtn = document.querySelector("#send-message");
+        let your_name = document.querySelector("#name")
+        let contacts = document.querySelector(".contacts")
+        let email = document.querySelector("#email")
 
         const socket = io();
         const usernameInfo = prompt("Enter your name");
+        const userEmailInfo = prompt("Enter your email");
+        your_name.innerHTML = usernameInfo;
+        email.innerHTML = userEmailInfo;
+         contacts.innerHTML += `
+            <li class="contact">
+                    <div class="ava"><img src="./assets/avatars/ava3.png" alt="hamster"></div>
+                    <div class="contact-info">
+                    <h4>${usernameInfo} &copy; Community</h4>
+                    <p> Message</p>
+                </div>
+            </li>`
 
 
 
