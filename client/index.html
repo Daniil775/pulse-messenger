@@ -39,9 +39,20 @@
                             <div class="contact-info">
                                 <h4>Eyecode &copy; Community</h4>
                                 <p> Message</p>
+                                <div class="online-users-info">
+                                    <img src="./assets/user-round.svg" alt="">
+                                     <div id="online"></div> Online
+                                    <div class="lighthouse"></div>
+                                    
+                                </div>
+                                <ul class="username-list">
+
+                                </ul>
+                                
                             </div>
                         </li>
                     </ul>
+
                 </aside>
                 <section id="main-side">
                     <div id="chat">
@@ -65,25 +76,26 @@
 
     <script>
         const msgInp = document.querySelector("#message");
-        const chat = document.querySelector("#chat")
+        const chat = document.querySelector("#chat");
         const sendBtn = document.querySelector("#send-message");
-        let your_name = document.querySelector("#name")
-        let contacts = document.querySelector(".contacts")
-        let email = document.querySelector("#email")
+        let your_name = document.querySelector("#name");
+        let contacts = document.querySelector(".contacts");
+        let email = document.querySelector("#email");
+        const onlineUsers = document.querySelector("#online");
 
         const socket = io();
         const usernameInfo = prompt("Enter your name");
         const userEmailInfo = prompt("Enter your email");
         your_name.innerHTML = usernameInfo;
         email.innerHTML = userEmailInfo;
-         contacts.innerHTML += `
-            <li class="contact">
-                    <div class="ava"><img src="./assets/avatars/ava3.png" alt="hamster"></div>
-                    <div class="contact-info">
-                    <h4>${usernameInfo} &copy; Community</h4>
-                    <p> Message</p>
-                </div>
-            </li>`
+        //  contacts.innerHTML += `
+        //     <li class="contact">
+        //             <div class="ava"><img src="./assets/avatars/ava3.png" alt="hamster"></div>
+        //             <div class="contact-info">
+        //             <h4>${usernameInfo} &copy; Community</h4>
+        //             <p> Message</p>
+        //         </div>
+        //     </li>`
 
 
 
@@ -104,6 +116,10 @@
         
         socket.on("chat message", ({msg,hour,min,username}) =>{
 
+
+
+
+
             isOwner = username === usernameInfo;
              let msg_template = `
             <div class="message ${isOwner ? "active" : ""}" >
@@ -117,7 +133,15 @@
             chat.innerHTML += msg_template
         })
 
-        socket.emit('set username',usernameInfo)
+        socket.on("online users", (data)=>{
+            console.log(data)
+            onlineUsers.innerHTML = data.count
+        })
+
+
+        socket.emit('set username',usernameInfo);
+
+        socket.emit("join",usernameInfo);
         
 
         sendBtn.onclick = () => {

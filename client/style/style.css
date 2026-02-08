@@ -94,6 +94,23 @@ header{
     border-radius: 10px;
 }
 
+.online-users-info{
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: "Poppins";
+    font-size: 0.8rem;
+    margin-top: 1rem;
+}
+
+.lighthouse{
+    width: 5px;
+    height: 5px;
+    background: greenyellow;
+    border-radius: 50%;
+    animation: blink 3s linear infinite;
+}
+
 main{
     max-width: 960px;
     width: 100%;
@@ -203,6 +220,7 @@ main{
 @media screen and (max-width: 965px){
     main{
         flex-direction: column;
+        margin: 0 !important;
     }
     #left-side{
         width: 100%;
@@ -215,6 +233,18 @@ main{
         nav{
             display: none;
         }
+    }
+}
+
+@keyframes blink{
+    0%{
+        opacity: 0;
+    }
+    50%{
+        opacity: 1;
+    }
+    100%{
+        opacity: 0;
     }
 }
 

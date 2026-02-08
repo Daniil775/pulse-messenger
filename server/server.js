@@ -10,8 +10,11 @@ const io = new Server(server);
 
 app.use(express.static(path.join(__dirname,"../client")));
 
+const online_users = new Map();
+let username = "Anonymus"
+
 io.on("connection", (socket) => {
-    let username = "Anonymus"
+    
     console.log("🔵" + socket.id + " user connected")
 
     socket.on('set username',(name) =>{
@@ -21,6 +24,26 @@ io.on("connection", (socket) => {
     socket.on("chat message", ({msg,hour,min}) =>{
         console.log('Message: ' + msg + ' at ' + hour + ':' + min);
         io.emit("chat message", {msg,hour,min,username})
+    })
+
+    socket.on("join",(name)=>{
+        socket.username = name;
+        online_users.set(socket.id,name)
+        io.emit("online users", {
+        users: [...online_users.values()],
+        count: online_users.size
+        })
+    })
+
+    
+
+    socket.on("disconnect", () => {
+        online_users.delete(socket.id)
+
+        io.emit("online users", {
+            users: [...online_users.values()],
+            count: online_users.size
+        })
     })
 })
 
