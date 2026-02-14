@@ -64,8 +64,10 @@
                             <div class="message-date">17:47</div>
                         </div>
                     </div>
+                    
                     <div id="main-side-controls">
-                        <input id="message" type="text" placeholder="text your message..."><button id="send-message">Send</button>
+                        <div id="typingIndicator"></div>
+                        <div id="input-box"><input id="message" type="text" placeholder="text your message..."><button id="send-message">Send</button></div></div>
                     </div>
                 </section>
             </main>
@@ -82,20 +84,17 @@
         let contacts = document.querySelector(".contacts");
         let email = document.querySelector("#email");
         const onlineUsers = document.querySelector("#online");
+        const typingInd = document.querySelector("#typingIndicator")
 
         const socket = io();
         const usernameInfo = prompt("Enter your name");
         const userEmailInfo = prompt("Enter your email");
         your_name.innerHTML = usernameInfo;
         email.innerHTML = userEmailInfo;
-        //  contacts.innerHTML += `
-        //     <li class="contact">
-        //             <div class="ava"><img src="./assets/avatars/ava3.png" alt="hamster"></div>
-        //             <div class="contact-info">
-        //             <h4>${usernameInfo} &copy; Community</h4>
-        //             <p> Message</p>
-        //         </div>
-        //     </li>`
+        let isTyping = false;
+        let typingTimeout;
+
+
 
 
 
@@ -133,6 +132,26 @@
             chat.innerHTML += msg_template
         })
 
+        socket.on("user typing",(name)=>{
+            typingInd.textContent = `${name} печатает...`
+        })
+        socket.on("user stop typing",(name)=>{
+            typingInd.textContent = ``
+        })
+        msgInp.addEventListener("input", ()=>{
+            if(!isTyping){
+                isTyping = true;
+                socket.emit("typing",usernameInfo)
+
+            }
+
+            clearTimeout(typingTimeout);
+
+            typingTimeout = setTimeout(()=>{
+                isTyping = false;
+                socket.emit("stop typing",usernameInfo)
+            },1500)
+        })
         socket.on("online users", (data)=>{
             console.log(data)
             onlineUsers.innerHTML = data.count

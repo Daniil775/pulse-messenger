@@ -136,23 +136,30 @@ main{
     display: flex;
     align-items: center;
     justify-content: center;
-    input{
-        width: 50%;
-        height: 40px;
-        background: none;
-        outline: none;
-        text-align: center;
-        border: 1px solid rgb(41, 41, 41);
-        border-radius: 10px;
-        color: white;
-    }
+    flex-direction: column;
+    #input-box{
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        input{
+            width: 50%;
+            height: 40px;
+            background: none;
+            outline: none;
+            text-align: center;
+            border: 1px solid rgb(41, 41, 41);
+            border-radius: 10px;
+            color: white;
+        }
 
-    button{
-        width: 55px;
-        height: 35px;
-        border-radius: 10px;
-        outline: none;
-        border: none;
+        button{
+            width: 55px;
+            height: 35px;
+            border-radius: 10px;
+            outline: none;
+            border: none;
+        }
     }
 }
 
@@ -217,6 +224,18 @@ main{
     width: 100%;
 }
 
+#typingIndicator{
+    color: gray;
+    font-family: monospace;
+}
+
+.message_controls_container{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 @media screen and (max-width: 965px){
     main{
         flex-direction: column;
@@ -247,4 +266,7 @@ main{
         opacity: 0;
     }
 }
+
+
+
 

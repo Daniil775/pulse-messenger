@@ -26,6 +26,16 @@ io.on("connection", (socket) => {
         io.emit("chat message", {msg,hour,min,username})
     })
 
+    socket.on("typing", (data)=>{
+        console.log(data + " text message...")
+        socket.broadcast.emit("user typing",data)
+    })
+
+    socket.on("stop typing", (data)=>{
+        console.log(data + " stop typing")
+        socket.broadcast.emit("user stop typing",data)
+    })
+
     socket.on("join",(name)=>{
         socket.username = name;
         online_users.set(socket.id,name)
