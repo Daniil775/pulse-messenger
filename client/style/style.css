@@ -172,6 +172,63 @@ main{
     width: 100%;
 }
 
+.voice_message{
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.8rem;
+    border-radius: 1.2rem;
+    width: 300px;
+    background: rgb(34, 34, 34);
+}
+
+.progress-container{
+    flex: 1;
+    height: 5px;
+    background: #555;
+    border-radius: 5px;
+    cursor: pointer;
+    position: relative;
+}
+
+.progress{
+    height: 100%;
+    width: 0%;
+    background: rgb(255, 93, 87);
+}
+
+.play-btn{
+    background: none;
+    outline: none;
+    border: none;
+    cursor: pointer;
+}
+
+.speed-btn{
+    background: none;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    color: white;
+}
+
+#fetch-voice{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    box-shadow: 0px 0px 10px red;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: calc(50% - 25px);
+    left: calc(50% - 25px);
+    animation: flash 3s infinite linear;
+    z-index: 1000;
+}
+
 .message-data{
     font-family: monospace;
     justify-self: end;
@@ -208,6 +265,10 @@ main{
 }
 .active{
      align-self: flex-end;
+}
+
+.active-mic{
+    display: flex !important;
 }
 
 .active-box{
@@ -255,6 +316,20 @@ main{
     }
 }
 
+@keyframes flash{
+    0%{
+        box-shadow: 5px 0px 15px red;
+    }
+    25%{
+        box-shadow: 0px 5px 15px red;
+    }
+    50%{
+         box-shadow: -5px 0px 15px red;
+    }
+    100%{
+       box-shadow: 5px 0px 15px red;
+    }
+}
 @keyframes blink{
     0%{
         opacity: 0;

@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 3001
 const app = express()
 const server = http.createServer(app);
 const io = new Server(server);
+const fs = require("fs");
 
 app.use(express.static(path.join(__dirname,"../client")));
 
@@ -24,6 +25,19 @@ io.on("connection", (socket) => {
     socket.on("chat message", ({msg,hour,min}) =>{
         console.log('Message: ' + msg + ' at ' + hour + ':' + min);
         io.emit("chat message", {msg,hour,min,username})
+    })
+
+    socket.on("voice message",(audioBuffer)=>{
+        // const fileName = `voice_${Date.now()}.webm`;
+        // const filePath = path.join(__dirname,"iploads",fileName)
+        // fs.writeFile(filePath,data,(err)=>{
+        //   if(err){
+        //     console.log(err)
+        //     return err;
+        //  }  
+        // })
+
+        io.emit("voice message", audioBuffer)
     })
 
     socket.on("typing", (data)=>{

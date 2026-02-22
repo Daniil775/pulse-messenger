@@ -55,6 +55,9 @@
 
                 </aside>
                 <section id="main-side">
+                    <div id="fetch-voice">
+                        <img src="./assets/mic.svg" alt="">
+                    </div>
                     <div id="chat">
                         <div class="message">
                             <div class="message-box">
@@ -63,11 +66,13 @@
                             </div>
                             <div class="message-date">17:47</div>
                         </div>
+
+                        
                     </div>
                     
                     <div id="main-side-controls">
                         <div id="typingIndicator"></div>
-                        <div id="input-box"><input id="message" type="text" placeholder="text your message..."><button id="send-message">Send</button></div></div>
+                        <div id="input-box"><input id="message" type="text" placeholder="text your message..."><button id="send-message">Send</button> <button id="send-mic"><img src="./assets/mic.svg" alt=""></button></div></div>
                     </div>
                 </section>
             </main>
@@ -93,6 +98,10 @@
         email.innerHTML = userEmailInfo;
         let isTyping = false;
         let typingTimeout;
+        let mediaRecorder;
+        let mediaChunks = [];
+        let sendMic = document.querySelector("#send-mic")
+        let fetchVoice = document.querySelector("#fetch-voice")
 
 
 
@@ -110,6 +119,76 @@
            
                 msgInp.value = "";
                 socket.emit("chat message",{msg,hour,min})
+        }
+
+        function sendVoiceMessage(audioUrl){
+            let audio = new Audio(audioUrl);
+            let container = document.createElement("div");
+            container.classList.add("voice_message")
+            let audio_msg_temp = `
+            <div class="voice_message">
+                      
+                            <button class="play-btn">
+                                <img src="./assets/play.svg" alt="">
+                            </button>
+                            <div class="progress-container">
+                                <div class="progress"></div>
+                            </div>
+                            <span class="time">0:00</span>
+                            
+                            <button class="speed-btn">1x</button>
+                    
+                        </div>
+            `
+            container.innerHTML = audio_msg_temp;
+
+            const playBtn = container.querySelector(".play-btn")
+            const progress = container.querySelector(".progress")
+            const progressContainer = container.querySelector(".progress-container")
+            const timeDisplay = container.querySelector(".time")
+            const speedBtn = container.querySelector(".speed-btn")
+            const playBtnIcon = playBtn.querySelector("img")
+  
+            let speed = 1;
+
+            playBtn.onclick = () => {
+                if(audio.paused){
+                    audio.play()
+                    playBtnIcon.src = "../assets/pause.svg";
+                }else{
+                    audio.pause();
+                    playBtnIcon.src = "../assets/play.svg";
+                }
+            }
+
+            //updating progress
+            audio.ontimeupdate = () =>{
+                let precent = (audio.currentTime / audio.duration) * 100;
+                progress.style.width = precent + '%' 
+
+                const mins = Math.floor(audio.currentTime / 60);
+                const secs = Math.floor(audio.currentTime % 60).toString().padStart(2,"0")
+                timeDisplay.textContent = `${mins}:${secs}`;
+            }
+
+            //peremotka
+
+            progressContainer.onclick = (e) =>{
+                const width = progressContainer.clientWidth;
+                const clickX = e.offsetX;
+                audio.currentTime = (clickX /width) * audio.duration;
+            }
+
+            //speed
+
+            speedBtn.onclick = () => {
+                speed = speed === 1 ? 1.5 : speed === 1.5 ? 2 : 1;
+                audio.playbackRate = speed;
+                speedBtn.textContent = speed + "x"
+            }
+
+            return container;
+
         }
         
         
@@ -138,6 +217,34 @@
         socket.on("user stop typing",(name)=>{
             typingInd.textContent = ``
         })
+
+        sendMic.onclick = async() => {
+            try{
+                const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+                fetchVoice.classList.add("active-mic");
+                mediaRecorder = new MediaRecorder(stream);
+
+                mediaRecorder.ondataavailable = (e) => {
+                    mediaChunks.push(e.data);
+                }
+
+                mediaRecorder.onstop = async() => {
+                    const audioBlob = new Blob(mediaChunks,{type:"audop/webm"});
+                    const arrayBuffer = await audioBlob.arrayBuffer();
+                    mediaChunks = [];
+                    socket.emit("voice message",arrayBuffer);
+                    console.log(audioBlob);
+                    console.log(arrayBuffer);
+                }
+
+                mediaRecorder.start();
+            }catch(err){
+                console.log(err)
+            }
+
+
+
+        }
         msgInp.addEventListener("input", ()=>{
             if(!isTyping){
                 isTyping = true;
@@ -152,6 +259,21 @@
                 socket.emit("stop typing",usernameInfo)
             },1500)
         })
+        
+        fetchVoice.addEventListener("click", ()=>{
+            if(mediaRecorder){
+                fetchVoice.classList.remove("active-mic");
+                mediaRecorder.stop();
+            }
+        })
+
+        socket.on("voice message", (data) =>{
+            const blob = new Blob([data],{type:"audio/webm"});
+            const audioUrl = URL.createObjectURL(blob);
+            const audio = sendVoiceMessage(audioUrl);
+            chat.appendChild(audio);
+        })
+        
         socket.on("online users", (data)=>{
             console.log(data)
             onlineUsers.innerHTML = data.count
