@@ -12,31 +12,24 @@ const fs = require("fs");
 app.use(express.static(path.join(__dirname,"../client")));
 
 const online_users = new Map();
-let username = "Anonymus"
+
 
 io.on("connection", (socket) => {
     
     console.log("🔵" + socket.id + " user connected")
 
+    socket.username = "Anonymus"
+
     socket.on('set username',(name) =>{
-        username = name;
+        socket.username = name;
     })
 
     socket.on("chat message", ({msg,hour,min}) =>{
         console.log('Message: ' + msg + ' at ' + hour + ':' + min);
-        io.emit("chat message", {msg,hour,min,username})
+        io.emit("chat message", {msg,hour,min,username: socket.username})
     })
 
     socket.on("voice message",(audioBuffer)=>{
-        // const fileName = `voice_${Date.now()}.webm`;
-        // const filePath = path.join(__dirname,"iploads",fileName)
-        // fs.writeFile(filePath,data,(err)=>{
-        //   if(err){
-        //     console.log(err)
-        //     return err;
-        //  }  
-        // })
-
         io.emit("voice message", audioBuffer)
     })
 
@@ -58,8 +51,6 @@ io.on("connection", (socket) => {
         count: online_users.size
         })
     })
-
-    
 
     socket.on("disconnect", () => {
         online_users.delete(socket.id)

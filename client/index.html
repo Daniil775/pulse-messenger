@@ -118,7 +118,7 @@
             let hour = now.getHours();
            
                 msgInp.value = "";
-                socket.emit("chat message",{msg,hour,min})
+                socket.emit("chat message", {msg, hour, min, username: usernameInfo})
         }
 
         function sendVoiceMessage(audioUrl){
@@ -198,7 +198,8 @@
 
 
 
-            isOwner = username === usernameInfo;
+            let isOwner = username === usernameInfo;
+            
              let msg_template = `
             <div class="message ${isOwner ? "active" : ""}" >
                 <div class="message-box ${isOwner ? "active-box" : ""}">
@@ -210,6 +211,7 @@
                 `
             chat.innerHTML += msg_template
         })
+        
 
         socket.on("user typing",(name)=>{
             typingInd.textContent = `${name} печатает...`
